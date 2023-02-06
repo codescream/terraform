@@ -1,18 +1,18 @@
 resource "aws_vpc" "terraform-vpc" {
-  cidr_block       = "10.0.0.0/16"
-  instance_tenancy = "default"
+  cidr_block       = var.vpc-cidr-blk
+  instance_tenancy = var.tenancy
 
   tags = {
-    Name = "terraform-vpc"
+    Name = var.vpc-name
   }
 }
 
 resource "aws_subnet" "terraform-subnet" {
   vpc_id = aws_vpc.terraform-vpc.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = var.subnet-cidr-blk
 
   tags = {
-    Name = "terraform-subnet"
+    Name = var.subnet-name
   }
 }
 
@@ -24,35 +24,35 @@ resource "aws_security_group" "terraform-secgrp" {
     description      = "Open to all incoming traffic"
     from_port        = 0
     to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    protocol         = var.protocol
+    cidr_blocks      = [var.ipv4-cidr-blk]
+    ipv6_cidr_blocks = [var.ipv6-cidr-blk]
   }
 
   egress {
     description      = "Open to all outgoing traffic"
     from_port        = 0
     to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+    protocol         = var.protocol
+    cidr_blocks      = [var.ipv4-cidr-blk]
+    ipv6_cidr_blocks = [var.ipv6-cidr-blk]
   }
 
   tags = {
-    Name = "terraform-secgrp"
+    Name = var.secgrp-name
   }
 }
 
 resource "aws_instance" "terraform-ec2" {
-  ami = "ami-042bbe4a84b81d198"
-  instance_type = "t2.micro"
-  tenancy = "default"
+  ami = var.ami
+  instance_type = var.ami_type
+  tenancy = var.tenancy
   subnet_id = aws_subnet.terraform-subnet.id
   vpc_security_group_ids = [aws_security_group.terraform-secgrp.id]
-  key_name = "devops"
+  key_name = var.key_name
   associate_public_ip_address = true
   tags = {
-    Name = "terraform-ec2"
+    Name = var.inst-name
   }
 }
 
