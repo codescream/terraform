@@ -1,6 +1,6 @@
 resource "aws_vpc" "terraform-vpc" {
   cidr_block       = var.vpc-cidr-blk
-  instance_tenancy = var.tenancy
+  instance_tenancy = lookup(var.aws-grp, "tenancy")
 
   tags = {
     Name = var.vpc-name
@@ -46,10 +46,10 @@ resource "aws_security_group" "terraform-secgrp" {
 resource "aws_instance" "terraform-ec2" {
   ami = var.ami
   instance_type = var.ami_type
-  tenancy = var.tenancy
+  tenancy = lookup(var.aws-grp, "tenancy")
   subnet_id = aws_subnet.terraform-subnet.id
   vpc_security_group_ids = [aws_security_group.terraform-secgrp.id]
-  key_name = var.key_name
+  key_name = lookup(var.aws-grp, "key_name")
   associate_public_ip_address = true
   tags = {
     Name = var.inst-name
